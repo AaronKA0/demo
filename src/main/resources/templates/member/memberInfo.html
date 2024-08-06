@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Success Login</title>
+<link rel="stylesheet" th:href="@{/css/myStyle.css}">
+</head>
+<body>
+
+	<p style="font-weight: bold; font-size: 30px; color: red;">登入成功!!</p>
+	<H2>會員資料</H2>
+
+	<table>
+		<tbody>
+			<tr>
+		    	<td>ID:</td>
+		    	<td th:text="${session.member.id}"></td>
+		    </tr>
+			<tr>
+		    	<td>Username:</td>
+		    	<td th:text="${session.member.username}"></td>
+		    </tr>
+			<tr>
+		    	<td>Name:</td>
+		    	<td th:text="${session.member.name}"></td>
+		    </tr>
+			<tr>
+		    	<td>Email:</td>
+		    	<td th:text="${session.member.email}"></td>
+		    </tr>
+	    </tbody>
+    </table>
+    
+    <div>
+    	<a th:href="@{/member/memberList}">會員清單</a>
+    	<a th:href="@{/index}">首頁</a>
+	</div>		
+	
+</body>
+</html>

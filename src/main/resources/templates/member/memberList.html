@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Member List</title>
+<link rel="stylesheet" th:href="@{/css/myStyle.css}">
+</head>
+<body>
+	<H2>全部會員清單</H2>
+
+	<table border='2px';>
+		<thead>
+            <tr style="padding: 5px;">
+                <th class="th_title">ID</th>
+                <th class="th_title">Username</th>
+                <th class="th_title">Name</th>
+                <th class="th_title">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <th:block th:each="member : ${memberList}">
+                <tr> 
+                    <td th:text="${member.id}"></td>
+                    <td th:text="${member.username}"></td>
+                    <td th:text="${member.name}"></td>
+                    <td th:text="${member.email}"></td>
+                </tr>
+            </th:block>
+        </tbody>
+    </table>
+    
+    <div>
+    	<a th:href="@{/index}">首頁</a>
+	</div>	
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Home</title>
+<link rel="stylesheet" th:href="@{/css/myStyle.css}">
+</head>
+<body>
+
+	<H2>首頁</H2>
+
+	<table>
+		<thead>
+			<tr th:if="${session.member}">
+				<th colspan="2" th:text=" 'Hello !!' + '&emsp;' + ${session.member.name}"></th>
+			</tr>
+			<tr th:unless="${session.member}">
+				<th colspan="2" th:text="'請登入會員 !'"></th>
+			</tr>
+		</thead>
+    </table>
+    
+    <img th:src="@{/images/pikmin.jpg}"/>
+    
+    <div th:if="${session.member}">
+		<form th:action="@{/logout}" method="post">
+	    	<button type="submit">登出</button>
+		</form>
+	</div>
+	<div th:unless="${session.member}">
+		<a th:href="@{/loginPage}">登入會員</a>
+		<a th:href="@{/loginPageAJAX}">AJAX登入會員</a>
+	</div>
+	
+</body>
+</html>
