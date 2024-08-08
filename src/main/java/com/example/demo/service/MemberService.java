@@ -23,17 +23,4 @@ public class MemberService{
 		return member;
 	}
 	
-	public Integer checkPassword(String username, String password) {
-		Member member = getOneMember(username);
-		if(member == null) {
-			return 0;
-		}
-		
-		if(member.getPassword().equals(password)) {
-			return 1;
-		}else {
-			return -1;
-		}
-	}
-	
 }

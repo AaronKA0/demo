@@ -1,7 +1,9 @@
 package com.example.demo.filter;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -22,98 +24,126 @@ import jakarta.servlet.http.HttpSession;
 
 public class LoginFilter implements Filter{
 	
-	@Autowired
-	private MemberService memberService;
-
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		Filter.super.init(filterConfig);
-		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
-	            								filterConfig.getServletContext());
+	private static final Set<String> allowedPath = new HashSet<>(Set.of(
+			"/demo/", "/demo/index", "/demo/loginPage", "/demo/loginPageAJAX", "/demo/css/myStyle.css", 
+			"/demo/images/Minions.gif", "/demo/images/redPikmin2.gif", "/demo/js/loginAJAX.js")); 
+	
+	MemberService memberService;
+	
+	public LoginFilter(MemberService memberService) {
+		super();
+		this.memberService = memberService;
 	}
+
+//	@Autowired
+//	private MemberService memberService;
+//
+//	@Override
+//	public void init(FilterConfig filterConfig) throws ServletException {
+//		Filter.super.init(filterConfig);
+//		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
+//	            								filterConfig.getServletContext());
+//	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		
+		System.out.println("Filter is working...");
+		
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
 		HttpServletResponse httpResponse = (HttpServletResponse)response;
 		String requestURI = httpRequest.getRequestURI();
+		System.out.println(requestURI);
 		
 		HttpSession session = httpRequest.getSession();
 		Object sessionMember = session.getAttribute("member");
 		
-		System.out.println("Filter is working...");
-		
-		// ---------------------------- AJAX ----------------------------
-		
-		boolean isLoginRequest = requestURI.equals("/demo/member/loginAJAX");
-		
-		if(isLoginRequest) {
-			ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, String> jsonMap = objectMapper.readValue(httpRequest.getInputStream(), Map.class);
-            
-            String username = jsonMap.get("username");
-            String password = jsonMap.get("password");
-            
-            Integer comparison = memberService.checkPassword(username, password);
-            
-			if(comparison == 1) {
-				httpRequest.setAttribute("username", username);
-				chain.doFilter(httpRequest, httpResponse);
-				return;
-			}else{
-				response.getWriter().write(Integer.toString(comparison));
-				return;
-			}
-		}
-		// ------------------------- END AJAX ----------------------------
-		
-		
-		if(sessionMember != null) {
+		if(allowedPath.contains(requestURI) || sessionMember != null) {
+			System.out.println("123");
 			chain.doFilter(httpRequest, httpResponse);
 			return;
 		}
+		
+		switch(requestURI) {
+			case "/demo/member/login":		
+				doLogin(httpRequest, httpResponse, session, chain);
+				break;
 				
-		if(requestURI.endsWith("/login")) {
-			String username = httpRequest.getParameter("username");
-			String password = httpRequest.getParameter("password");
-
-			if(username == null || password == null) {
+			case "/demo/member/loginAJAX":
+				doLoginAJAX(httpRequest, httpResponse, response, chain);
+	            break;
+	            
+			default:
+				System.out.println("321");
 				session.setAttribute("errorMsg", "請登入會員");
 				httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
-				return;
-			}
-			
-			Integer comparison = memberService.checkPassword(username, password);
-			switch(comparison) {
-				case 1:
-					Member member = memberService.getOneMember(username);
-					session.setAttribute("member", member);
-					chain.doFilter(httpRequest, httpResponse);
-					break;
-				case -1:
-					session.setAttribute("errorMsg", "帳號密碼錯誤，請重新輸入");
-					httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
-					break;
-				case 0:
-					session.setAttribute("errorMsg", "查無此會員帳號");
-				default:
-					httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
-					break;
-			}
-			
-		}else {
-			session.setAttribute("errorMsg", "請登入會員");
-			httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
-			return;
 		}
-			
+
 	}
 
 	@Override
 	public void destroy() {
 		Filter.super.destroy();
 	}
-
+	
+	
+	
+	public void doLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+													HttpSession session, FilterChain chain) throws IOException, ServletException{
+		String username = httpRequest.getParameter("username");
+		String password = httpRequest.getParameter("password");
+		
+		Member member = memberService.getOneMember(username);
+		if (member == null) {
+			session.setAttribute("errorMsg", "查無此會員帳號");
+			httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
+			return;
+		}else {
+			String memberPassword = member.getPassword();
+			if(!(memberPassword.equals(password))) {
+				session.setAttribute("errorMsg", "帳號密碼錯誤，請重新輸入");
+				httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
+				return;
+			}else {
+				httpRequest.setAttribute("username", username);
+				chain.doFilter(httpRequest, httpResponse);
+			}			
+		}
+		
+	}
+	
+	
+	public void doLoginAJAX(HttpServletRequest httpRequest, HttpServletResponse httpResponse, 
+				ServletResponse response, FilterChain chain) throws IOException, ServletException{
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> jsonMap = objectMapper.readValue(httpRequest.getInputStream(), Map.class);
+        
+        String usernameAJAX = jsonMap.get("username");
+        String passwordAJAX = jsonMap.get("password");
+        
+        if(usernameAJAX == "" || passwordAJAX == "") {
+        	response.getWriter().write("");
+			return;
+		}
+        
+        Member memberAJAX = memberService.getOneMember(usernameAJAX);
+        if (memberAJAX == null) {
+        	response.getWriter().write("null");
+			return;
+		}else {
+			
+			String memberPasswordAJAX = memberAJAX.getPassword();
+			if(!(memberPasswordAJAX.equals(passwordAJAX))) {
+				response.getWriter().write("fail");
+				return;
+			}else {
+				httpRequest.setAttribute("username", usernameAJAX);
+				chain.doFilter(httpRequest, httpResponse);
+			}			
+		}
+		
+	}
+	
 }

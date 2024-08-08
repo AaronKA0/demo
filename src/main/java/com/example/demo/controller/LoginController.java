@@ -23,20 +23,16 @@ public class LoginController {
 	@Autowired
 	private MemberService memberService;
 	
-	@GetMapping("/memberList")
-	public String memberList(Model model, HttpSession session) {
-		List<Member> memberList = memberService.getAll();
-		model.addAttribute("memberList", memberList);
-		return "/member/memberList";
-	}
-	
 	@GetMapping("/login")
 	public String getLogin() {
 		return "/member/memberInfo";
 	}
 	
 	@PostMapping("/login")
-	public String postLogin() {
+	public String postLogin(HttpServletRequest request, HttpSession session) {
+		String username = (String) request.getAttribute("username");
+		Member member = memberService.getOneMember(username);
+		session.setAttribute("member", member);
 		return "/member/memberInfo";
 	}
 	
@@ -47,12 +43,19 @@ public class LoginController {
 	
 	@PostMapping("/loginAJAX")
 	@ResponseBody
-    public String getLoginAJAX(HttpServletRequest request, HttpSession session) {
+	public String getLoginAJAX(HttpServletRequest request, HttpSession session) {
 		String username = (String) request.getAttribute("username");
 		Member member = memberService.getOneMember(username);
 		session.setAttribute("member", member);
-        return "success";
-    }	
+		return "success";
+	}	
+	
+	@GetMapping("/memberList")
+	public String memberList(Model model, HttpSession session) {
+		List<Member> memberList = memberService.getAll();
+		model.addAttribute("memberList", memberList);
+		return "/member/memberList";
+	}
 	
 	
 }

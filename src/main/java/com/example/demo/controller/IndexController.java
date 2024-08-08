@@ -44,7 +44,6 @@ public class IndexController {
 			session.invalidate();
 		    return "redirect:/";
 		}
-		
 		return "redirect:/";
 	}
 	

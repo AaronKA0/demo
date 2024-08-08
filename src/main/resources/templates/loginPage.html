@@ -2,9 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Login</title>
+    
     <link rel="stylesheet" th:href="@{/css/myStyle.css}">
 </head>
 <body>
+<main>
     <h1>會員登入</h1>
     
     <form th:action="@{/member/login}" method="post">
@@ -25,11 +27,10 @@
 	</div>
     
     <div style="font-weight: bold; color: red;">
-    	<label th:if="${session}" th:text="${session.member}"></label>
-    </div>
-    
-    <div style="font-weight: bold; color: red;">
     	<label th:if="${session}" th:text="${session.errorMsg}"></label>
     </div>
+    
+</main>
+
 </body>
 </html>
