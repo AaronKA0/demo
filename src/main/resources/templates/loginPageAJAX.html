@@ -7,39 +7,33 @@
     <link rel="stylesheet" type="text/css" href="./css/myStyle.css">
     
 </head>
-<body>
+<body class="bg-info bg-opacity-10">
     <div class="container">
-        <main class="form-signin w-100 m-auto">
+        <main class="bg-white border border-primary rounded shadow-lg col-8 m-auto p-2">
             <div id="loginSheet" class="mb-2">            
                 <img class="mb-2 img-fluid" src="./images/redPikmin2.gif" alt="redPikmin2.gif" width="333" height="188">
-                <p class="h3 mb-3 fw-bold">會員登入</p>
+                <div class="h3 col-10 m-auto mb-3 fw-bold">會員登入</div>
 
-                <div class="form-floating col-6 m-auto mb-2">
+                <div class="form-floating col-10 m-auto mb-2">
                     <input type="text" class="form-control" id="username" placeholder="username" required>
                     <label for="username">Username</label>
                 </div>
-                <div class="form-floating col-6 m-auto mb-2">
+                <div class="form-floating col-10 m-auto mb-2">
                     <input type="password" class="form-control" id="password" placeholder="password" required>
                     <label for="password">Password</label>
                 </div>
 
-                <button id="loginBotton" class="fw-bold col-6 btn btn-outline-primary" type="button">登入</button>
+                <button id="loginBotton" class="fw-bold col-10 btn btn-outline-primary" type="button">登入</button>
             </div>
             
 		    <div class="mt-2">
-		    	<a class="fw-bold col-6 btn btn-outline-primary" th:href="@{/index}">首頁</a>
+		    	<a class="fw-bold col-10 btn btn-outline-primary" th:href="@{/index}">首頁</a>
 			</div>
-			
+    
+    		<div class="fw-bold text-danger m-0">
+    			<label id="errorMsg"></label>
+    		</div>	
         </main>
-    </div>
-
-    
-    <div style="font-weight: bold; color: red;">
-    	<label th:if="${session}" th:text="${session.member}"></label>
-    </div>
-    
-    <div style="font-weight: bold; color: red;">
-    	<label id="errorMsg"></label>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>

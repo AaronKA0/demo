@@ -1,25 +1,22 @@
 package com.example.demo.filter;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.example.demo.service.MemberService;
-
 @Configuration
 public class FilterConfig {
-
-	private final MemberService memberService;
-
-    public FilterConfig(MemberService memberService) {
-        this.memberService = memberService;
-    }
+	
+	@Autowired
+	private LoginFilter loginFilter;
 	
 	@Bean
-	public FilterRegistrationBean<LoginFilter> loginFilter(){
+	public FilterRegistrationBean<LoginFilter> loginFilterMethod(){
 		FilterRegistrationBean<LoginFilter> registrationBean = new FilterRegistrationBean<>();
-		registrationBean.setFilter(new LoginFilter(memberService));
+		registrationBean.setFilter(loginFilter);
 		registrationBean.addUrlPatterns("/*");
 		return registrationBean;
 	}
+
 }

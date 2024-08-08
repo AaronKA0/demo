@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.springframework.stereotype.Component;
 
 import com.example.demo.model.Member;
 import com.example.demo.service.MemberService;
@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -22,28 +21,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@Component
 public class LoginFilter implements Filter{
 	
 	private static final Set<String> allowedPath = new HashSet<>(Set.of(
 			"/demo/", "/demo/index", "/demo/loginPage", "/demo/loginPageAJAX", "/demo/css/myStyle.css", 
 			"/demo/images/Minions.gif", "/demo/images/redPikmin2.gif", "/demo/js/loginAJAX.js")); 
-	
-	MemberService memberService;
-	
-	public LoginFilter(MemberService memberService) {
-		super();
-		this.memberService = memberService;
-	}
 
-//	@Autowired
-//	private MemberService memberService;
-//
-//	@Override
-//	public void init(FilterConfig filterConfig) throws ServletException {
-//		Filter.super.init(filterConfig);
-//		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
-//	            								filterConfig.getServletContext());
-//	}
+	@Autowired
+	private MemberService memberService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -54,13 +40,11 @@ public class LoginFilter implements Filter{
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
 		HttpServletResponse httpResponse = (HttpServletResponse)response;
 		String requestURI = httpRequest.getRequestURI();
-		System.out.println(requestURI);
 		
 		HttpSession session = httpRequest.getSession();
 		Object sessionMember = session.getAttribute("member");
 		
 		if(allowedPath.contains(requestURI) || sessionMember != null) {
-			System.out.println("123");
 			chain.doFilter(httpRequest, httpResponse);
 			return;
 		}
@@ -75,7 +59,6 @@ public class LoginFilter implements Filter{
 	            break;
 	            
 			default:
-				System.out.println("321");
 				session.setAttribute("errorMsg", "請登入會員");
 				httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
 		}
