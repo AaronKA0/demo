@@ -33,7 +33,7 @@ public class LoginFilter implements Filter{
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+						throws IOException, ServletException {
 		
 		System.out.println("Filter is working...");
 		
@@ -72,7 +72,7 @@ public class LoginFilter implements Filter{
 	
 	
 	public void doLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-													HttpSession session, FilterChain chain) throws IOException, ServletException{
+						HttpSession session, FilterChain chain) throws IOException, ServletException{
 		String username = httpRequest.getParameter("username");
 		String password = httpRequest.getParameter("password");
 		
