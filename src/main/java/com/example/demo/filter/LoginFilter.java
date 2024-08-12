@@ -24,9 +24,9 @@ import jakarta.servlet.http.HttpSession;
 @Component
 public class LoginFilter implements Filter{
 	
-	private static final Set<String> allowedPath = new HashSet<>(Set.of(
-			"/demo/", "/demo/index", "/demo/loginPage", "/demo/loginPageAJAX", "/demo/css/myStyle.css", 
-			"/demo/images/Minions.gif", "/demo/images/redPikmin2.gif", "/demo/js/loginAJAX.js")); 
+	private static final Set<String> allowedPath = Set.of(
+			"/", "/index", "/loginPage", "/loginPageAJAX", "/css/myStyle.css", 
+			"/images/Minions.gif", "/images/redPikmin2.gif", "/js/loginAJAX.js"); 
 
 	@Autowired
 	private MemberService memberService;
@@ -39,28 +39,27 @@ public class LoginFilter implements Filter{
 		
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
 		HttpServletResponse httpResponse = (HttpServletResponse)response;
-		String requestURI = httpRequest.getRequestURI();
+		
+		String requestPath = httpRequest.getServletPath();
 		
 		HttpSession session = httpRequest.getSession();
 		Object sessionMember = session.getAttribute("member");
 		
-		if(allowedPath.contains(requestURI) || sessionMember != null) {
+		if(allowedPath.contains(requestPath) || sessionMember != null) {
 			chain.doFilter(httpRequest, httpResponse);
-			return;
-		}
-		
-		switch(requestURI) {
-			case "/demo/member/login":		
-				doLogin(httpRequest, httpResponse, session, chain);
-				break;
-				
-			case "/demo/member/loginAJAX":
-				doLoginAJAX(httpRequest, httpResponse, response, chain);
-	            break;
-	            
-			default:
-				session.setAttribute("errorMsg", "請登入會員");
-				httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
+		}else {
+			
+			switch(requestPath) {
+				case "/member/login":		
+					doLogin(httpRequest, httpResponse, session, chain);
+					break;
+				case "/member/loginAJAX":
+					doLoginAJAX(httpRequest, httpResponse, response, chain);
+		            break;
+				default:
+					session.setAttribute("errorMsg", "請登入會員");
+					httpResponse.sendRedirect(httpRequest.getContextPath() + "/loginPage");
+			}
 		}
 
 	}
